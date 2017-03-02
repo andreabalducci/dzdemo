@@ -12,15 +12,15 @@ export class DropzoneDirective implements OnInit {
     path = path || '';
     if (entry.isFile) {
       // Get file
-      entry.file(function (file) {
+      entry.file((file) => {
         console.log('File:', path + file.name);
       });
     } else if (entry.isDirectory) {
       // Get folder contents
-        console.log('Directory:',path +  entry.name);
+      console.log('Directory:', path + entry.name);
 
       const dirReader = entry.createReader();
-      dirReader.readEntries(function (entries) {
+      dirReader.readEntries((entries) => {
         for (let i = 0; i < entries.length; i++) {
           console.log('this is ', this);
           host.traverse(host, entries[i], path + entry.name + '/');
@@ -32,10 +32,10 @@ export class DropzoneDirective implements OnInit {
   ngOnInit(): void {
     const host = this;
     this.ngZone.runOutsideAngular(() => {
-      this.el.nativeElement.addEventListener('drop', function (e) {
+      this.el.nativeElement.addEventListener('drop', (e) => {
         e.stopPropagation();
         e.preventDefault();
-        let items = e.dataTransfer.items;
+        const items = e.dataTransfer.items;
         for (let i = 0; i < items.length; i++) {
           const entry = items[i].webkitGetAsEntry();
           if (entry) {
@@ -44,7 +44,7 @@ export class DropzoneDirective implements OnInit {
         }
       }, false);
 
-      this.el.nativeElement.ondragover = function (e) {
+      this.el.nativeElement.ondragover = (e) => {
         e.preventDefault();
       };
     });
