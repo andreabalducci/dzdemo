@@ -8,7 +8,7 @@ export class DropzoneDirective implements OnInit {
 
   }
 
-  traverse(host: DropzoneDirective, entry, path?: string): void {
+  traverse(entry, path?: string): void {
     path = path || '';
     if (entry.isFile) {
       // Get file
@@ -22,15 +22,13 @@ export class DropzoneDirective implements OnInit {
       const dirReader = entry.createReader();
       dirReader.readEntries((entries) => {
         for (let i = 0; i < entries.length; i++) {
-          console.log('this is ', this);
-          host.traverse(host, entries[i], path + entry.name + '/');
+          this.traverse(entries[i], path + entry.name + '/');
         }
       });
     }
   }
 
   ngOnInit(): void {
-    const host = this;
     this.ngZone.runOutsideAngular(() => {
       this.el.nativeElement.addEventListener('drop', (e) => {
         e.stopPropagation();
@@ -39,7 +37,7 @@ export class DropzoneDirective implements OnInit {
         for (let i = 0; i < items.length; i++) {
           const entry = items[i].webkitGetAsEntry();
           if (entry) {
-            host.traverse(host, entry);
+            this.traverse(entry);
           }
         }
       }, false);
