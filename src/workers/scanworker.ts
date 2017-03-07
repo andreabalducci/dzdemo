@@ -1,20 +1,21 @@
+onmessage = (e: MessageEvent) => {
+    const scan = new ScanWorker();
+    scan.start(e.data);
+};
+
 class ScanWorker {
     folders = 0;
     files = 0;
-
-    onmessage(e) {
-        console.log('worker start', e);
-    };
 
     start(items: DataTransferItemList) {
         this.files = 0;
         this.folders = 0;
 
         for (let i = 0; i < items.length; i++) {
-          const entry = items[i].webkitGetAsEntry();
-          if (entry) {
-            this.traverse(entry);
-          }
+            const entry = items[i].webkitGetAsEntry();
+            if (entry) {
+                this.traverse(entry);
+            }
         }
 
         // @@TODO wait callbacks
