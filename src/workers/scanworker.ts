@@ -1,7 +1,8 @@
-onmessage = (e: MessageEvent) => {
+export function scan(list: DataTransferItemList) {
+    console.log('starting scan from ', list);
     const scan = new ScanWorker();
-    scan.start(e.data);
-};
+    scan.start(list);
+}
 
 class ScanWorker {
     folders = 0;
@@ -12,7 +13,7 @@ class ScanWorker {
         this.folders = 0;
 
         for (let i = 0; i < items.length; i++) {
-            const entry = items[i].webkitGetAsEntry();
+            const entry = (<any>items[i]).webkitGetAsEntry();
             if (entry) {
                 this.traverse(entry);
             }
@@ -29,11 +30,11 @@ class ScanWorker {
             // Get file
             entry.file((file) => {
                 this.files++;
-                //        console.log('File:', path + file.name);
+                console.log('File:', path + file.name);
             });
         } else if (entry.isDirectory) {
             // Get folder contents
-            //      console.log('Directory:', path + entry.name);
+            console.log('Directory:', path + entry.name);
             this.folders++;
 
             const dirReader = entry.createReader();
@@ -48,4 +49,10 @@ class ScanWorker {
             console.log(`Files ${this.files} Folders ${this.folders}`);
         }
     }
+}
+
+if (window.document === undefined) {
+    onmessage = (e: MessageEvent) => {
+        scan(e.data[0]);
+    };
 }

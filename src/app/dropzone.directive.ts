@@ -1,4 +1,5 @@
 import { Directive, HostListener, ElementRef, NgZone, OnInit } from '@angular/core';
+import { scan } from '..//workers//scanworker';
 
 @Directive({
   selector: '[appDropzone]'
@@ -20,21 +21,32 @@ export class DropzoneDirective implements OnInit {
     };
   }
 
+  processDrop(list: DataTransferItemList) {
+    if (this.worker) {
+      this.worker.postMessage('start', [list]);
+      return;
+    }
+
+    scan(list);
+  }
+
   ngOnInit(): void {
-    this.initWorker();
+    //    this.initWorker();
 
     this.ngZone.runOutsideAngular(() => {
       this.el.nativeElement.addEventListener('drop', (e: DragEvent) => {
         e.stopPropagation();
         e.preventDefault();
-
         const items = e.dataTransfer.items;
-        this.worker.postMessage('start', [items]);
+
+        this.processDrop(items);
 
       }, false);
 
-      this.el.nativeElement.ondragover = (e) => {
+      this.el.nativeElement.ondragover = (e: DragEvent) => {
+        e.stopPropagation();
         e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
       };
     });
   };
